@@ -4,12 +4,19 @@ from django.contrib.auth.models import AbstractUser
 
 class User(AbstractUser):
     user_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
+    username = models.CharField(max_length=150, unique=True)
+    email = models.EmailField(unique=True)
+    password = models.CharField(max_length=128)
     first_name = models.CharField(max_length=150)
     last_name = models.CharField(max_length=150)
     phone_number = models.CharField(max_length=15, unique=True)
 
+    REQUIRED_FIELDS = ['username', 'first_name', 'last_name', 'phone_number']
+    USERNAME_FIELD = 'email'
+
     def __str__(self):
-        return f"{self.username} ({self.phone_number})"
+        return f"{self.email} ({self.username})"
 
 class Conversation(models.Model):
     conversation_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -27,4 +34,4 @@ class Message(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Message {self.message_id} from {self.sender}"
+        return f"Message {self.message_id} from {self.sender.email}"
