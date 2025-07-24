@@ -1,14 +1,18 @@
+import uuid
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 
 class User(AbstractUser):
-    user_id = models.AutoField(primary_key=True)
-    # `password`, `username`, `email`, etc., are inherited from AbstractUser
+    user_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    first_name = models.CharField(max_length=150)
+    last_name = models.CharField(max_length=150)
+    phone_number = models.CharField(max_length=15, unique=True)
+
     def __str__(self):
-        return self.username
+        return f"{self.username} ({self.phone_number})"
 
 class Conversation(models.Model):
-    conversation_id = models.AutoField(primary_key=True)
+    conversation_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     participants = models.ManyToManyField(User, related_name='conversations')
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -16,7 +20,7 @@ class Conversation(models.Model):
         return f"Conversation {self.conversation_id}"
 
 class Message(models.Model):
-    message_id = models.AutoField(primary_key=True)
+    message_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     conversation = models.ForeignKey(Conversation, on_delete=models.CASCADE, related_name='messages')
     sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_messages')
     content = models.TextField()
